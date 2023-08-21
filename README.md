@@ -4,7 +4,7 @@
 
 ## Description
 
-[Mimic-Bot]A Discord bot that uses OpenAi for replies.
+[Mimic-Bot] A Discord bot that uses OpenAi for replies.
 
 ## Installation
 
