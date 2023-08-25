@@ -1,15 +1,19 @@
 // src/discord/commands/commands.service.ts
 
 import { Injectable } from '@nestjs/common';
+import { PingCommand } from 'src/mimic-bot/commands/ping.command';
 import {
   Command,
   IOptionResponse,
-  PingCommand,
-} from 'src/mimic-bot/commands/ping.command';
+  SetBotRoleCommand,
+} from 'src/mimic-bot/commands/set-bot-role.command';
+import { OpenAiClientService } from './openAiClient.service';
 
 @Injectable()
 export class CommandsService {
-  private commands: Command[] = [PingCommand]; // Add more commands here
+  private commands: Command[] = [PingCommand, SetBotRoleCommand]; // Add more commands here
+
+  constructor(private readonly openAiClientService: OpenAiClientService) {}
 
   async executeCommand(
     commandName: string,
@@ -18,7 +22,7 @@ export class CommandsService {
     const command = this.commands.find((cmd) => cmd.name === commandName);
 
     if (command) {
-      return await command.execute(args);
+      return await command.execute(args, this.openAiClientService);
     }
 
     return null;

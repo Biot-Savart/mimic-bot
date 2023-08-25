@@ -1,23 +1,4 @@
-export interface IOptionRequest {
-  name: string;
-  type: number;
-  description: string;
-  required?: boolean;
-  choices?: { name: string; value: string }[];
-}
-
-export interface IOptionResponse {
-  name: string;
-  type: number;
-  value?: string | number | boolean;
-}
-
-export interface Command {
-  name: string;
-  description: string;
-  options: IOptionRequest[];
-  execute: (args: IOptionResponse[]) => Promise<string>;
-}
+import { Command, IOptionResponse } from './set-bot-role.command';
 
 export const PingCommand: Command = {
   name: 'ping',
