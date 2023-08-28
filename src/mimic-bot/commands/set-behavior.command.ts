@@ -6,12 +6,13 @@ import { BaseCommand, IOptionResponse } from './base.command';
 interface SetBehaviorCommandArguments {
   args: IOptionResponse[];
   client: OpenAiClientService;
+  channelId: string;
 }
 
 export class SetBehaviorCommand extends BaseCommand<SetBehaviorCommandArguments> {
   constructor() {
     super({
-      name: 'behavior',
+      name: 'set_behavior',
       description:
         'Used to provide high-level instructions or context-setting messages to the Bot',
       options: [
@@ -26,7 +27,10 @@ export class SetBehaviorCommand extends BaseCommand<SetBehaviorCommandArguments>
   }
 
   async execute(input: SetBehaviorCommandArguments): Promise<string> {
-    input.client.setSystemMessage(input.args[0].value as string);
+    input.client.setSystemMessage(
+      input.channelId,
+      input.args[0].value as string,
+    );
     return `Behavior set: ${input.args[0].value}`;
   }
 }

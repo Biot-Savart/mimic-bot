@@ -11,7 +11,8 @@ interface ConversationMessage {
 @Injectable()
 export class OpenAiClientService {
   private readonly openai: OpenAIApi;
-  private conversation: ConversationMessage[] = [];
+  //private conversations: ConversationMessage[] = [];
+  private conversations: Record<number, ConversationMessage[]> = {};
 
   constructor(private readonly configService: ConfigService) {
     const configuration = new Configuration({
@@ -20,19 +21,26 @@ export class OpenAiClientService {
     this.openai = new OpenAIApi(configuration);
   }
 
-  async generateResponse(prompt: string): Promise<string> {
+  async generateResponse(prompt: string, channelId: string): Promise<string> {
     try {
-      this.conversation.push({ role: 'user', content: prompt });
-      console.log(this.conversation);
+      if (!this.conversations[channelId]) this.conversations[channelId] = [];
+
+      this.conversations[channelId].push({ role: 'user', content: prompt });
+      //this.conversations.push({ role: 'user', content: prompt });
+      console.log(this.conversations);
       const completion = await this.openai.createChatCompletion({
         model: 'gpt-3.5-turbo',
         temperature: 0.6,
-        messages: this.conversation,
+        messages: this.conversations[channelId],
       });
 
       const result = completion.data.choices[0].message.content.trim();
-      this.conversation.push({ role: 'assistant', content: result });
-      this.trimConversation();
+      //this.conversations.push({ role: 'assistant', content: result });
+      this.conversations[channelId].push({
+        role: 'assistant',
+        content: result,
+      });
+      this.trimConversation(channelId);
       return result;
     } catch (error) {
       console.error('Error with OpenAI API:', error.message);
@@ -40,27 +48,37 @@ export class OpenAiClientService {
     }
   }
 
-  setSystemMessage(message: string): void {
-    this.conversation.push({
+  setSystemMessage(channelId: string, message: string): void {
+    if (!this.conversations[channelId]) this.conversations[channelId] = [];
+    this.conversations[channelId].push({
       role: 'system',
       content: message,
     });
   }
 
-  clearConversation(): void {
-    this.conversation = [];
+  clearSystemMessages(channelId: string): void {
+    if (!this.conversations[channelId]) this.conversations[channelId] = [];
+    this.conversations[channelId] = this.conversations[channelId].filter(
+      (m) => m.role !== 'system',
+    );
   }
 
-  trimConversation(maxConversationLength = 20): void {
-    const systemMessages = this.conversation
+  clearConversation(channelId: string): void {
+    this.conversations[channelId] = [];
+  }
+
+  trimConversation(channelId: string, maxConversationLength = 20): void {
+    if (!this.conversations[channelId]) this.conversations[channelId] = [];
+
+    const systemMessages = this.conversations[channelId]
       .filter((m) => m.role === 'system')
       .filter(
         (value, index, self) =>
           self.findIndex((obj) => obj.content === value.content) === index,
       );
-    this.conversation = [
+    this.conversations[channelId] = [
       ...systemMessages,
-      ...this.conversation.slice(-maxConversationLength),
+      ...this.conversations[channelId].slice(-maxConversationLength),
     ];
   }
 }

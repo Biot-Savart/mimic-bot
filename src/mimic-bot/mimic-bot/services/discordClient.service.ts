@@ -87,6 +87,7 @@ export class DiscordClientService {
 
       const response = await this.openAiClientService.generateResponse(
         userInput,
+        message.channelId,
       );
 
       // Send the generated reply back to the Discord channel
@@ -98,6 +99,7 @@ export class DiscordClientService {
     if (!interaction.isChatInputCommand()) return;
 
     const response = await this.commandsService.executeCommand(
+      interaction.channelId,
       interaction.commandName,
       [...interaction.options.data],
     );
