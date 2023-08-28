@@ -5,13 +5,13 @@ import { PingCommand } from 'src/mimic-bot/commands/ping.command';
 import {
   Command,
   IOptionResponse,
-  SetBotRoleCommand,
+  SetBehaviorCommand,
 } from 'src/mimic-bot/commands/set-bot-role.command';
 import { OpenAiClientService } from './openAiClient.service';
 
 @Injectable()
 export class CommandsService {
-  private commands: Command[] = [PingCommand, SetBotRoleCommand]; // Add more commands here
+  private commands: Command[] = [PingCommand, SetBehaviorCommand]; // Add more commands here
 
   constructor(private readonly openAiClientService: OpenAiClientService) {}
 
