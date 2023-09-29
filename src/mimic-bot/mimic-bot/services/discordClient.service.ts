@@ -76,34 +76,49 @@ export class DiscordClientService {
   }
 
   private async handleMessage(message: Message<boolean>) {
-    // Check if the message author is a bot to avoid infinite loops
-    if (message.author.bot) return;
+    try {
+      // Check if the message author is a bot to avoid infinite loops
+      if (message.author.bot) return;
 
-    // Check for specific commands or triggers
-    if (message.content.startsWith('!')) {
-      // Extract the user input from the message
-      const userInput = message.content.slice('!'.length).trim();
-      // Make the API call to generate a response
+      // Check for specific commands or triggers
+      if (message.content.startsWith('!')) {
+        // Extract the user input from the message
+        const userInput = message.content.slice('!'.length).trim();
+        // Make the API call to generate a response
 
-      const response = await this.openAiClientService.generateResponse(
-        userInput,
-        message.channelId,
+        const response = await this.openAiClientService.generateResponse(
+          userInput,
+          message.channelId,
+        );
+
+        // Send the generated reply back to the Discord channel
+        message.channel.send(response);
+      }
+    } catch (error) {
+      console.error(error);
+      await message.channel.send(
+        'An error occurred while generating the response: ' + error.message,
       );
-
-      // Send the generated reply back to the Discord channel
-      message.channel.send(response);
     }
   }
 
   private async handleCommand(interaction: Interaction<CacheType>) {
-    if (!interaction.isChatInputCommand()) return;
+    if (!interaction.isChatInputCommand() || !interaction.isCommand()) return;
 
-    const response = await this.commandsService.executeCommand(
-      interaction.channelId,
-      interaction.commandName,
-      [...interaction.options.data],
-    );
+    try {
+      const response = await this.commandsService.executeCommand(
+        interaction.channelId,
+        interaction.commandName,
+        [...interaction.options.data],
+        interaction.user.username,
+      );
 
-    interaction.reply(response);
+      interaction.reply(response);
+    } catch (error) {
+      console.error(error);
+      await interaction.reply(
+        'An error occurred while executing the command: ' + error.message,
+      );
+    }
   }
 }

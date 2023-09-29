@@ -44,7 +44,7 @@ export class OpenAiClientService {
       return result;
     } catch (error) {
       console.error('Error with OpenAI API:', error.message);
-      throw error;
+      return 'Error with OpenAI API:' + error.message;
     }
   }
 

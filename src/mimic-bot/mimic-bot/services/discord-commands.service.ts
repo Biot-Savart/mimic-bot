@@ -1,5 +1,3 @@
-// src/discord/commands/commands.service.ts
-
 import { Injectable } from '@nestjs/common';
 import {
   BaseCommand,
@@ -7,8 +5,11 @@ import {
 } from 'src/mimic-bot/commands/base.command';
 import { ClearBehaviorCommand } from 'src/mimic-bot/commands/clear-behavior.command';
 import { ClearCommand } from 'src/mimic-bot/commands/clear.command';
+import { JokeCommand } from 'src/mimic-bot/commands/joke.command';
 import { PingCommand } from 'src/mimic-bot/commands/ping.command';
+import { QuoteCommand } from 'src/mimic-bot/commands/quote.command';
 import { SetBehaviorCommand } from 'src/mimic-bot/commands/set-behavior.command';
+import { TriviaCommand } from 'src/mimic-bot/commands/trivia.command';
 import { OpenAiClientService } from './openAiClient.service';
 
 @Injectable()
@@ -18,7 +19,10 @@ export class CommandsService {
     new SetBehaviorCommand(),
     new ClearCommand(),
     new ClearBehaviorCommand(),
-  ]; // Add more commands here
+    new TriviaCommand(),
+    new JokeCommand(),
+    new QuoteCommand(),
+  ];
 
   constructor(private readonly openAiClientService: OpenAiClientService) {}
 
@@ -26,15 +30,22 @@ export class CommandsService {
     channelId: string,
     commandName: string,
     args: IOptionResponse[],
+    user: string,
   ): Promise<string | null> {
-    const command = this.commands.find((cmd) => cmd.name === commandName);
+    try {
+      const command = this.commands.find((cmd) => cmd.name === commandName);
 
-    if (command) {
-      return await command.execute({
-        channelId,
-        args,
-        client: this.openAiClientService,
-      });
+      if (command) {
+        return await command.execute({
+          channelId,
+          args,
+          client: this.openAiClientService,
+          user,
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      return 'An error occurred while executing the command: ' + error.message;
     }
 
     return null;
