@@ -48,6 +48,22 @@ export class OpenAiClientService {
     }
   }
 
+  async generateImage(prompt: string): Promise<string> {
+    try {
+      const image = await this.openai.createImage({
+        prompt,
+        n: 1,
+        size: '512x512',
+      });
+      console.log('image', image.data.data);
+      const imageUrl = image.data.data[0].url;
+      return imageUrl;
+    } catch (error) {
+      console.error('Error with OpenAI API:', error.message);
+      return 'Error with OpenAI API:' + error.message;
+    }
+  }
+
   setSystemMessage(channelId: string, message: string): void {
     if (!this.conversations[channelId]) this.conversations[channelId] = [];
     this.conversations[channelId].push({

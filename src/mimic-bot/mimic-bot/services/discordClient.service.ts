@@ -86,13 +86,17 @@ export class DiscordClientService {
         const userInput = message.content.slice('!'.length).trim();
         // Make the API call to generate a response
 
-        const response = await this.openAiClientService.generateResponse(
-          userInput,
-          message.channelId,
-        );
+        this.openAiClientService
+          .generateResponse(userInput, message.channelId)
+          .then(
+            async (response) => {
+              await message.channel.send(response);
+            },
+            (error) => console.log(error),
+          );
 
         // Send the generated reply back to the Discord channel
-        message.channel.send(response);
+        //message.reply(`${interaction.commandName} being executed`);
       }
     } catch (error) {
       console.error(error);
@@ -106,14 +110,20 @@ export class DiscordClientService {
     if (!interaction.isChatInputCommand() || !interaction.isCommand()) return;
 
     try {
-      const response = await this.commandsService.executeCommand(
-        interaction.channelId,
-        interaction.commandName,
-        [...interaction.options.data],
-        interaction.user.username,
-      );
-
-      interaction.reply(response);
+      this.commandsService
+        .executeCommand(
+          interaction.channelId,
+          interaction.commandName,
+          [...interaction.options.data],
+          interaction.user.username,
+        )
+        .then(
+          (response) => {
+            interaction.channel.send(response);
+          },
+          (error) => console.log(error),
+        );
+      return interaction.reply(`${interaction.commandName} being executed`);
     } catch (error) {
       console.error(error);
       await interaction.reply(

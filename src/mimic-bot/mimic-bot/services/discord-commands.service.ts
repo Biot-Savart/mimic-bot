@@ -5,6 +5,7 @@ import {
 } from 'src/mimic-bot/commands/base.command';
 import { ClearBehaviorCommand } from 'src/mimic-bot/commands/clear-behavior.command';
 import { ClearCommand } from 'src/mimic-bot/commands/clear.command';
+import { GenerateImageCommand } from 'src/mimic-bot/commands/generate-image.command';
 import { JokeCommand } from 'src/mimic-bot/commands/joke.command';
 import { PingCommand } from 'src/mimic-bot/commands/ping.command';
 import { QuoteCommand } from 'src/mimic-bot/commands/quote.command';
@@ -22,6 +23,7 @@ export class CommandsService {
     new TriviaCommand(),
     new JokeCommand(),
     new QuoteCommand(),
+    new GenerateImageCommand(),
   ];
 
   constructor(private readonly openAiClientService: OpenAiClientService) {}
