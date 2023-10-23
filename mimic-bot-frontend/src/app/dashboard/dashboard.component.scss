@@ -1,0 +1,28 @@
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+
+  th, td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+
+  th {
+    background-color: #007BFF; /* Blue background color */
+    color: #fff; /* White text color */
+  }
+
+  tr:nth-child(even) {
+    background-color: #E6F7FF; /* Light blue background color for even rows */
+  }
+
+  tr:nth-child(odd) {
+    background-color: #fff; /* White background color for odd rows */
+  }
+
+  tr:hover {
+    background-color: #B3E0FF; /* Hover background color for all rows */
+  }
+}

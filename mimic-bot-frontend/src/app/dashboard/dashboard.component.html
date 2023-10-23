@@ -1,0 +1,10 @@
+<div>
+  <h2>WebSocket Dashboard Messages:</h2>
+  <table>
+    <tr><th>Request</th><th>Response</th></tr>
+    <tr *ngFor="let command of commands">
+      <td>{{command.request}}</td>
+      <td>{{command.response}}</td>
+    </tr>
+  </table>
+</div>

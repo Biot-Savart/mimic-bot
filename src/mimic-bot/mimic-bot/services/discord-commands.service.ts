@@ -11,6 +11,7 @@ import { PingCommand } from 'src/mimic-bot/commands/ping.command';
 import { QuoteCommand } from 'src/mimic-bot/commands/quote.command';
 import { SetBehaviorCommand } from 'src/mimic-bot/commands/set-behavior.command';
 import { TriviaCommand } from 'src/mimic-bot/commands/trivia.command';
+import { WebsocketGateway } from '../../../websocket/websocket.gateway';
 import { OpenAiClientService } from './openAiClient.service';
 
 @Injectable()
@@ -26,7 +27,10 @@ export class CommandsService {
     new GenerateImageCommand(),
   ];
 
-  constructor(private readonly openAiClientService: OpenAiClientService) {}
+  constructor(
+    private readonly openAiClientService: OpenAiClientService,
+    private websocketGateway: WebsocketGateway,
+  ) {}
 
   async executeCommand(
     channelId: string,
@@ -38,12 +42,21 @@ export class CommandsService {
       const command = this.commands.find((cmd) => cmd.name === commandName);
 
       if (command) {
-        return await command.execute({
+        const result = await command.execute({
           channelId,
           args,
           client: this.openAiClientService,
           user,
         });
+
+        this.websocketGateway.emitMessage('command', {
+          request: `Command: ${commandName} with args: ${JSON.stringify(
+            args,
+          )} received from ${user}`,
+          response: result,
+        });
+
+        return result;
       }
     } catch (error) {
       console.error(error);
